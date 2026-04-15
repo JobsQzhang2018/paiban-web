@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>排版工坊</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github.min.css">
+  <link rel="stylesheet" href="./app.css">
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">排</div>
+        <div>
+          <h1>排版工坊</h1>
+          <p>可嵌入博客的网页排版工具</p>
+        </div>
+      </div>
+
+      <section class="panel">
+        <div class="panel-head">
+          <h2>操作</h2>
+        </div>
+        <div class="toolbar-grid">
+          <button id="importBtn" class="btn btn-secondary" type="button">导入 Markdown</button>
+          <button id="resetBtn" class="btn btn-ghost" type="button">恢复示例</button>
+          <button id="copyHtmlBtn" class="btn btn-primary" type="button">复制 HTML</button>
+          <button id="exportPngBtn" class="btn btn-primary" type="button">导出长图</button>
+        </div>
+        <input id="fileInput" type="file" accept=".md,.markdown,.txt,text/markdown,text/plain" hidden>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <h2>发布</h2>
+        </div>
+        <label class="field">
+          <span>博客发布接口</span>
+          <input id="publishEndpoint" type="url" placeholder="https://your-blog-api.example.com/publish">
+        </label>
+        <label class="field">
+          <span>访问令牌</span>
+          <input id="publishToken" type="password" placeholder="可选">
+        </label>
+        <div class="toolbar-grid toolbar-grid-single">
+          <button id="publishBtn" class="btn btn-primary" type="button">发布到博客</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <h2>平台</h2>
+        </div>
+        <div class="segmented">
+          <button class="segmented-item active" data-platform="wechat" type="button">公众号</button>
+          <button class="segmented-item" data-platform="blog" type="button">博客</button>
+          <button class="segmented-item" data-platform="zhihu" type="button">知乎</button>
+          <button class="segmented-item" data-platform="medium" type="button">Medium</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <h2>主题</h2>
+        </div>
+        <label class="field">
+          <span>排版风格</span>
+          <select id="themeSelect">
+            <option value="paper">Paper</option>
+            <option value="ink">Ink</option>
+            <option value="aurora">Aurora</option>
+            <option value="mono">Mono</option>
+          </select>
+        </label>
+        <label class="field">
+          <span>正文宽度</span>
+          <input id="contentWidth" type="range" min="560" max="900" step="10" value="720">
+          <strong id="contentWidthValue">720px</strong>
+        </label>
+        <label class="field">
+          <span>字号</span>
+          <input id="fontSize" type="range" min="14" max="22" step="1" value="16">
+          <strong id="fontSizeValue">16px</strong>
+        </label>
+        <label class="field">
+          <span>行高</span>
+          <input id="lineHeight" type="range" min="1.5" max="2.1" step="0.05" value="1.8">
+          <strong id="lineHeightValue">1.8</strong>
+        </label>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <h2>信息</h2>
+        </div>
+        <dl class="stats">
+          <div>
+            <dt>字数</dt>
+            <dd id="charCount">0</dd>
+          </div>
+          <div>
+            <dt>单词</dt>
+            <dd id="wordCount">0</dd>
+          </div>
+          <div>
+            <dt>预计阅读</dt>
+            <dd id="readTime">0 分钟</dd>
+          </div>
+        </dl>
+      </section>
+    </aside>
+
+    <main class="workspace">
+      <section class="editor-pane">
+        <div class="pane-head">
+          <h2>Markdown</h2>
+          <div class="pane-actions">
+            <button id="insertTemplateBtn" class="mini-btn" type="button">插入博客模板</button>
+            <button id="clearBtn" class="mini-btn" type="button">清空</button>
+          </div>
+        </div>
+        <textarea id="editor" spellcheck="false"></textarea>
+      </section>
+
+      <section class="preview-pane">
+        <div class="pane-head">
+          <h2>预览</h2>
+          <p id="statusText">本地自动保存已开启</p>
+        </div>
+        <div class="preview-stage">
+          <section class="meta-card">
+            <div class="meta-grid">
+              <label class="field">
+                <span>标题</span>
+                <input id="metaTitle" type="text" placeholder="输入文章标题">
+              </label>
+              <label class="field">
+                <span>Slug</span>
+                <input id="metaSlug" type="text" placeholder="post-slug">
+              </label>
+              <label class="field">
+                <span>作者</span>
+                <input id="metaAuthor" type="text" placeholder="作者名">
+              </label>
+              <label class="field">
+                <span>摘要</span>
+                <input id="metaExcerpt" type="text" placeholder="一句话摘要">
+              </label>
+              <label class="field field-full">
+                <span>标签</span>
+                <input id="metaTags" type="text" placeholder="排版, 博客, Markdown">
+              </label>
+              <label class="field field-full">
+                <span>封面图</span>
+                <input id="metaCover" type="url" placeholder="https://example.com/cover.jpg">
+              </label>
+            </div>
+          </section>
+          <div id="previewCard" class="preview-card theme-paper platform-wechat">
+            <article id="previewContent" class="wenyan-output"></article>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
